@@ -26,7 +26,7 @@ namespace csaudio
         ////////////////////////
 
         /* Diretório padrão Steam */
-        public static string steamDir = @"Program Files (x86)\Steam\steamapps\common\Half-Life\cstrikex";
+        public static string steamDir = @"Program Files (x86)\Steam\steamapps\common\Half-Life\cstrike";
 
         /* Diretório de backup de audio e localização do cstrike */
         public static string backupDir = @"\cs16_audio_backup";

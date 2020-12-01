@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -1885,7 +1886,6 @@ namespace csaudio
             timerCredits.Interval = 1;
             timerCredits.Start();
 
-
             /* Create backup if doesn't exists */
             InitializeBackup();
 
@@ -2060,11 +2060,38 @@ namespace csaudio
 
         private void btnExecutar_Click(object sender, EventArgs e)
         {
+            /* Check if half-life is running */
+            Process[] processlist = Process.GetProcesses();
+            foreach (Process theprocess in processlist)
+            {
+                if (String.Compare(theprocess.ProcessName, "hl") == 0)
+                {
+                    string p = String.Format("{0}.exe PID: {1}", theprocess.ProcessName, theprocess.Id);
+                    MessageBox.Show("Por favor, feche o Counter Strike antes de continuar.\n" + p, "Counter Strike Aberto | " + p, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    Console.WriteLine("HalfLife: {0}.exe PID: {1}", theprocess.ProcessName, theprocess.Id);
+                    return;
+                }
+            }
+
             Execute();
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
+
+            /* Check if half-life is running */
+            Process[] processlist = Process.GetProcesses();
+            foreach (Process theprocess in processlist)
+            {
+                if (String.Compare(theprocess.ProcessName, "hl") == 0)
+                {
+                    string p = String.Format("{0}.exe PID: {1}", theprocess.ProcessName, theprocess.Id);
+                    MessageBox.Show("Por favor, feche o Counter Strike antes de continuar.\n" + p, "Counter Strike Aberto | " + p, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    Console.WriteLine("HalfLife: {0}.exe PID: {1}", theprocess.ProcessName, theprocess.Id);
+                    return;
+                }
+            }
+
             resetAudio reset = new resetAudio();
             reset.ShowDialog();
 
