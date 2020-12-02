@@ -231,7 +231,7 @@ namespace csaudio
             this.lblCredits.Name = "lblCredits";
             this.lblCredits.Size = new System.Drawing.Size(719, 20);
             this.lblCredits.TabIndex = 8;
-            this.lblCredits.Text = "v1.0 - Developed by Murilo @ (github.com/trusted-ws/cs16audio)";
+            this.lblCredits.Text = "v1.1 - Developed by Murilo @ (github.com/trusted-ws/cs16audio)";
             this.lblCredits.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // button1
