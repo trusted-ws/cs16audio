@@ -70,21 +70,31 @@ namespace csaudio
             {
                 if (File.Exists(cst + "\\steam.inf"))
                 {
-                    string[] ver = File.ReadAllText(cst + "\\steam.inf").Split('=');
+                    string[] ver = File.ReadAllLines(cst + "\\steam.inf");
                     try
                     {
                         lblExe.ForeColor = Color.Black;
-                        lblExe.Text = String.Format("Versão: (Steam) {0}", ver[1]);
+                        if(auxiliary.Functions.checkForBots())
+                            lblExe.Text = String.Format("Versão: (Steam) {0} (com bots)", ver[0].Split('=')[1].Trim());
+                        else
+                            lblExe.Text = String.Format("Versão: (Steam) {0}", ver[0].Split('=')[1].Trim());
                     }
                     catch (Exception ex)
                     {
-                        lblExe.ForeColor = Color.Red;
-                        lblExe.Text = String.Format("Versão: desconhecida (Steam)");
+                        lblExe.ForeColor = Color.Black;
+                        if(auxiliary.Functions.checkForBots())
+                            lblExe.Text = String.Format("Versão: desconhecida (Steam) (com bots)");
+                        else
+                            lblExe.Text = String.Format("Versão: desconhecida (Steam)");
                     }
                 }
                 else
                 {
-                    lblExe.Text = "";
+                    lblExe.ForeColor = Color.Black;
+                    if (auxiliary.Functions.checkForBots())
+                        lblExe.Text = String.Format("Versão: desconhecida (com bots)");
+                    else
+                        lblExe.Text = String.Format("Versão: desconhecida");
                 }
                 textGameDir.ForeColor = Color.Green;
                 textGameDir.Text = cst;
@@ -250,6 +260,8 @@ namespace csaudio
         private void Execute()
         {
             int concluido = 0;
+            int ignorados = 0; // Quantidade de arquivos que foram ignorados.
+
             foreach(string audio in listBoxFiles.Items)
             {
                 // TODO: Check if audio / cstrole/sound exists. [OK]
@@ -267,17 +279,33 @@ namespace csaudio
                         //Console.WriteLine("Copying {0} para {1}", audio, path);
                         try
                         {
-                            File.Copy(audio, path, true);
+                            /* Check if cstrike have bots before perform copy */
+                            auxiliary.Functions.checkForBots();
+                            string[] subs = path.Split('\\');
+                            if (String.Compare(subs[subs.Count() - 2], "bot") == 0)
+                            {
+                                if (config.haveBots)
+                                    File.Copy(audio, path, true);
+                                else
+                                    ignorados++;
+                            }
+                            else
+                            {
+                                File.Copy(audio, path, true);
+                            }
+
                             concluido++;
                         }
                         catch(System.IO.DirectoryNotFoundException dirExp)
                         {
-                            string fn = Path.GetFileName(audio);
+                            string fn = Path.GetFileName(path);
                             string msg = "";
 
-                            // Check if 'audio' path is the bot path.
-                            string[] subs = audio.Split('\\');
-                            if(String.Compare(subs[subs.Length - 2], "bot") == 0)
+                            // Check if 'audio' path is the bot path.d
+                            string[] subs = path.Split('\\');
+                            
+                            //Console.WriteLine(String.Format("{0}: {1}", path, subs[subs.Count() - 2]));
+                            if(String.Compare(subs[subs.Count() - 2], "bot") == 0)
                             {
                                 msg = String.Format("Não foi possível completar a operação, pois o seu Counter Strike não possuí bots.\n\nO arquivo '{0}'é um arquivo de áudio dos bots.", fn);
                             } else {
@@ -306,9 +334,9 @@ namespace csaudio
             if (concluido > 0)
             {
                 if(concluido > 1)
-                    MessageBox.Show(String.Format("Operação concluída!\n{0} arquivos foram instalados com êxito.", concluido), "Operação concluída!", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show(String.Format("Operação concluída!\n\n{0} arquivos foram instalados com êxito.\n{1} arquivos ignorados.", concluido, ignorados), "Operação concluída!", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 else
-                    MessageBox.Show(String.Format("Operação concluída!\n{0} arquivo instalado com êxito.", concluido), "Operação concluída!", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show(String.Format("Operação concluída!\n\n{0} arquivo instalado com êxito.\n{1} arquivos ignorados.", concluido, ignorados), "Operação concluída!", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             btnExecutar.Enabled = false;
             lblAudioName.Text = "";
@@ -640,6 +668,12 @@ namespace csaudio
             }
             //Console.WriteLine("s:{0} - {1}, {2}, {3}", stage, R, G, B);
             lblCredits.ForeColor = Color.FromArgb(R, G, B);
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            bots b = new bots();
+            b.ShowDialog();
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,21 +12,49 @@ namespace csaudio
 
         public static class Functions
         {
+
+            public static bool checkForBots()
+            {
+                bool bots = false;
+
+                /* TODO: Verificar se o diretorio cstrike contém a estrutura de bots [OK] */
+                if(!Directory.Exists(config.cstrike))
+                {
+                    Console.WriteLine("[DEBUG] checkForBots() ~ config.cstrike ({0}) doesn't exists.", config.cstrike);
+                    return false;
+                }
+
+                /* Check for bots: csbot, zbot, podbot structures */
+
+                if (File.Exists(config.cstrike + @"\dlls\csbot.dll") && Directory.Exists(config.cstrike + @"\sound\radio\bot"))
+                {
+                    /* csbot (to install) */
+                    bots = true;
+
+                } else if (File.Exists(config.cstrike + @"\dlls\mpold.dll")) {
+
+                    /* zbot */
+                    bots = true;
+
+                } else if(Directory.Exists(config.cstrike + @"\PODBot") || File.Exists(config.cstrike + @"\PODBot\podbot.dll"))
+                {
+                    /* podbot */
+                    bots = true;
+                }
+                else
+                {
+                    /* No bots */
+                    bots = false;
+                }
+
+                config.haveBots = bots;
+                return bots;
+            }
             public static List<string> SwitchPath(string audioName, string bp)
             {
-                // return type:  output + @"\" + audioName;
                 List<string> outputs = new List<string>();
                 string basePath = bp;
                 bool add = true;    /* Trigger for multiple output (false = multiple output)*/
-
-                /* Biggest Switch */
-                //////////////////////////////////////////////////////////////////////
-                /*                                                                  //
-                  Issue: [FIXED]                                                    //
-                       Os arquivos headshot2.wav estão em Player e Weapons          //
-                       Os arquivos cow.wav e sheep.wav estão em Misc e Ambience     //
-                 */                                                                 //
-                //////////////////////////////////////////////////////////////////////
                 
                 switch (audioName)
                 {

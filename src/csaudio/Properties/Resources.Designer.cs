@@ -113,6 +113,26 @@ namespace csaudio.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap counter_strike_source_18px {
+            get {
+                object obj = ResourceManager.GetObject("counter_strike_source_18px", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap counter_strike_source_w18px {
+            get {
+                object obj = ResourceManager.GetObject("counter_strike_source_w18px", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap cs16 {
             get {
                 object obj = ResourceManager.GetObject("cs16", resourceCulture);

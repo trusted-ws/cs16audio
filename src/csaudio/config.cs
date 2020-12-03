@@ -21,6 +21,9 @@ namespace csaudio
         /* Trigger para exit no Form 'locateCstrike' */
         public static bool locateSair = false;
 
+        /* Caso haja bots na estrutura de diretórios do cstrike isto será definido como true */
+        public static bool haveBots = false;
+
         ////////////////////////
         // Definições
         ////////////////////////
