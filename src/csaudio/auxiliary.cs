@@ -2,16 +2,349 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Resources;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
+using System.IO.Compression;
 
 namespace csaudio
 {
-    public static class auxiliary
+/*    public static class ZipArchiveExtensions
     {
+        public static void ExtractToDirectory(this ZipArchive archive, string destinationDirectoryName, bool overwrite)
+        {
+            if (!overwrite)
+            {
+                archive.ExtractToDirectory(destinationDirectoryName);
+                return;
+            }
+
+            DirectoryInfo di = Directory.CreateDirectory(destinationDirectoryName);
+            string destinationDirectoryFullPath = di.FullName;
+
+            foreach (ZipArchiveEntry file in archive.Entries)
+            {
+                string completeFileName = Path.GetFullPath(Path.Combine(destinationDirectoryFullPath, file.FullName));
+
+                if (!completeFileName.StartsWith(destinationDirectoryFullPath, StringComparison.OrdinalIgnoreCase))
+                {
+                    throw new IOException("Trying to extract file outside of destination directory. See this link for more info: https://snyk.io/research/zip-slip-vulnerability");
+                }
+
+                if (file.Name == "")
+                {// Assuming Empty for Directory
+                    Directory.CreateDirectory(Path.GetDirectoryName(completeFileName));
+                    continue;
+                }
+                file.ExtractToFile(completeFileName, true);
+            }
+        }
+    }*/
+    public class auxiliary
+    {
+
+        public static class Data
+        {
+            // cstrike/liblist.gam
+            public static string[] liblist_gam = {
+                "game \"Counter - Strike\"",
+                "url_info \"www.counter-strike.net\"",
+                "url_dl \"\"",
+                "version \"1.6\"",
+                "size \"184000000\"",
+                "svonly \"0\"",
+                "secure \"1\"",
+                "type \"multiplayer_only\"",
+                "cldll \"1\"",
+                "hlversion \"1111\"",
+                "nomodels \"1\"",
+                "nohimodel \"1\"",
+                "mpentity \"info_player_start\"",
+                "gamedll \"dlls\\mp.dll\"",         /* <-- Change this for bots configuration [13]*/
+                "gamedll_linux \"dlls/cs.so\"",
+                "gamedll_osx \"dlls/cs.dylib\"",
+                "trainmap \"tr_1\"",
+                "edicts	\"1800\""
+            };
+        }
 
         public static class Functions
         {
+
+            public static string GetLastError()
+            {
+                if (String.IsNullOrWhiteSpace(config.lastError) || String.IsNullOrWhiteSpace(config.lastError)) {
+                    return null;
+                }
+                string error = config.lastError;
+                config.lastError = "";
+                return error;
+            }
+
+            public static int botsType()
+            {
+                /* Check for cstrike, zbot, podbot structures for remove */
+                /*     RETURN: 
+                 *          0 - null
+                 *          1 - csbot
+                 *          2 - zbot
+                 *          3 - podbot
+                 */
+
+                
+                if(File.Exists(config.cstrike + @"\dlls\csbot.dll"))
+                {
+                    /* csbot */
+                    return 1;
+                } else if(File.Exists(config.cstrike + @"\dlls\mpold.dll"))
+                {
+                    /* zbot */
+                    return 2;
+                } else if(Directory.Exists(config.cstrike + @"\PODBot"))
+                {
+                    /* podbot */
+                    return 3;
+                } else
+                {
+                    /* Null */
+                    return 0;
+                }
+
+            }
+            public static int CopyResource(byte[] resource, string file)
+            {
+                try
+                {
+                    File.WriteAllBytes(file, resource);
+                    return 0;
+                } catch(Exception e)
+                {
+                    config.lastError = e.Message.ToString();
+                    return 1;
+                }
+
+            }
+
+            public static int CopyResource(string resource, string file)
+            {
+                try
+                {
+                    File.WriteAllBytes(file, Encoding.ASCII.GetBytes(resource));
+                    return 0;
+                } catch(Exception e)
+                {
+                    config.lastError = e.Message.ToString();
+                    return 1;
+                }
+
+            }
+
+            private static int deleteFile(string file)
+            {
+                if (File.Exists(file))
+                {
+                    try
+                    {
+                        File.Delete(file);
+                        return 0;
+                    } catch(Exception e)
+                    {
+                        config.lastError = e.Message.ToString();
+                        return 1;
+                    }
+                } else
+                {
+                    config.lastError = String.Format("O arquivo {0} não existe!", file);
+                    return 1;
+                }
+            }
+
+            private static int deleteDirectory(string dir)
+            {
+                if(Directory.Exists(dir))
+                {
+                    try
+                    {
+                        Directory.Delete(dir, true);
+                        return 0;
+                    } catch(Exception e)
+                    {
+                        config.lastError = e.Message.ToString();
+                        return 1;
+                    }
+                } else
+                {
+                    config.lastError = String.Format("O diretório {0} não existe!", dir);
+                    return 1;
+                }
+            }
+
+            public static int removeBots()
+            {
+                // TODO: armazenar cstrike_bot_backup_steam ...
+                //       armazenar csbot ...
+                //       (comprimir) para resources.
+                //
+
+                int type = botsType(); /* 0 (null) */
+
+                //int type = 1; //debug
+
+                string e;   /* For GetLastError() output */
+                int retn = 0; /* Return value */
+
+                switch (type)
+                {
+
+                    ///////////////////////////////
+                    // Remove csbot
+                    ///////////////////////////////
+
+                    /* Replace */
+                    //      -> cstrike/liblist.gam
+                    //      -> cstirke/commandmenu.txt
+                    //      -> cstrike/resource/CreateMultiplayerGameServerPage.res
+
+                    /* Delete */
+                    //      -> cstrike/dlls/csbot.dll
+                    //      -> cstirke/sound/radio/bot
+                    //      -> cstrike/resource/CreateMultiplayerGameBotPage.res
+                    //      -> cstrike/BotChatter.db
+                    //      -> cstrike/BotProfile.db
+                    //      -> cstrike/csbot_about.txt
+                    //      -> cstrike/csbot_commands.txt
+                    
+                    case 1:
+
+                        /* Copy 'liblist.gam', 'commandmenu.txt' and 'CreateMultiplayerGameServerPage.res' to cstrike */
+                        CopyResource(csaudio.Properties.Resources.liblist, config.cstrike + @"\liblist.gam");
+                        e = GetLastError();
+                        if(e != null) { MessageBox.Show(e, "Exeção!", MessageBoxButtons.OK, MessageBoxIcon.Error); }
+
+                        CopyResource(csaudio.Properties.Resources.commandmenu, config.cstrike + @"\commandmenu.txt");
+                        e = GetLastError();
+                        if (e != null) { MessageBox.Show(e, "Exeção!", MessageBoxButtons.OK, MessageBoxIcon.Error); }
+
+                        CopyResource(csaudio.Properties.Resources.CreateMultiplayerGameServerPage, config.cstrike + @"\resource\CreateMultiplayerGameServerPage.res");
+                        e = GetLastError();
+                        if (e != null) { MessageBox.Show(e, "Exeção!", MessageBoxButtons.OK, MessageBoxIcon.Error); }
+
+                        /* Delete */
+                        deleteFile(config.cstrike + @"\dlls\csbot.dll");
+                        e = GetLastError();
+                        if (e != null) { MessageBox.Show(e, "Exeção!", MessageBoxButtons.OK, MessageBoxIcon.Error); }
+
+                        deleteFile(config.cstrike + @"\resource\CreateMultiplayerGameBotPage.res");
+                        e = GetLastError();
+                        if (e != null) { MessageBox.Show(e, "Exeção!", MessageBoxButtons.OK, MessageBoxIcon.Error); }
+
+                        deleteFile(config.cstrike + @"\BotChatter.db");
+                        e = GetLastError();
+                        if (e != null) { MessageBox.Show(e, "Exeção!", MessageBoxButtons.OK, MessageBoxIcon.Error); }
+
+                        deleteFile(config.cstrike + @"\BotProfile.db");
+                        e = GetLastError();
+                        if (e != null) { MessageBox.Show(e, "Exeção!", MessageBoxButtons.OK, MessageBoxIcon.Error); }
+
+                        deleteFile(config.cstrike + @"\csbot_about.txt");
+                        e = GetLastError();
+                        if (e != null) { MessageBox.Show(e, "Exeção!", MessageBoxButtons.OK, MessageBoxIcon.Error); }
+
+                        deleteFile(config.cstrike + @"\csbot_commands.txt");
+                        e = GetLastError();
+                        if (e != null) { MessageBox.Show(e, "Exeção!", MessageBoxButtons.OK, MessageBoxIcon.Error); }
+
+                        deleteDirectory(config.cstrike + @"\sound\radio\bot");
+                        e = GetLastError();
+                        if (e != null) { MessageBox.Show(e, "Exeção!", MessageBoxButtons.OK, MessageBoxIcon.Error); }
+
+                        MessageBox.Show("CSBOT Desinstalado com sucesso!", "Operação Concluída!", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                        break;
+
+
+                    ///////////////////////////////
+                    // Remove zbot
+                    ///////////////////////////////
+
+                    /* Replace */
+                    //      -> cstrike/liblist.gam
+                    //      -> cstirke/commandmenu.txt
+
+                    /* Delete */
+                    //      -> cstrike/dlls/mpold.dll
+                    //      -> cstirke/sprites
+                    //      -> cstrike/zbot_command.txt
+
+                    case 2:
+
+                        /* Copy 'liblist.gam' and 'commandmenu.txt' to cstrike */
+                        CopyResource(csaudio.Properties.Resources.liblist, config.cstrike + @"\liblist.gam");
+                        e = GetLastError();
+                        if (e != null) { MessageBox.Show(e, "Exeção!", MessageBoxButtons.OK, MessageBoxIcon.Error); }
+
+                        CopyResource(csaudio.Properties.Resources.commandmenu, config.cstrike + @"\commandmenu.txt");
+                        e = GetLastError();
+                        if (e != null) { MessageBox.Show(e, "Exeção!", MessageBoxButtons.OK, MessageBoxIcon.Error); }
+
+                        /* Delete */
+                        deleteFile(config.cstrike + @"\dlls\mpold.dll");
+                        e = GetLastError();
+                        if (e != null) { MessageBox.Show(e, "Exeção!", MessageBoxButtons.OK, MessageBoxIcon.Error); }
+
+                        deleteFile(config.cstrike + @"\zbot_command.txt");
+                        e = GetLastError();
+                        if (e != null) { MessageBox.Show(e, "Exeção!", MessageBoxButtons.OK, MessageBoxIcon.Error); }
+
+                        deleteDirectory(config.cstrike + @"\sprites");
+                        e = GetLastError();
+                        if (e != null) { MessageBox.Show(e, "Exeção!", MessageBoxButtons.OK, MessageBoxIcon.Error); }
+
+                        MessageBox.Show("Zbot Desinstalado com sucesso!", "Operação Concluída!", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                        break;
+
+
+                    ///////////////////////////////
+                    // Remove podbot
+                    ///////////////////////////////
+
+                    /* Replace */
+                    //      -> cstrike/liblist.gam
+
+                    /* Delete */
+                    //      -> cstrike/PODBot
+                    //      -> cstirke/poduninst.log
+
+                    case 3:
+                        /* Copy 'liblist.gam' and 'commandmenu.txt' to cstrike */
+                        CopyResource(csaudio.Properties.Resources.liblist, config.cstrike + @"\liblist.gam");
+                        e = GetLastError();
+                        if (e != null) { MessageBox.Show(e, "Exeção!", MessageBoxButtons.OK, MessageBoxIcon.Error); }
+
+                        /* Delete */
+                        deleteFile(config.cstrike + @"\poduninst.log");
+                        e = GetLastError();
+                        if (e != null) { MessageBox.Show(e, "Exeção!", MessageBoxButtons.OK, MessageBoxIcon.Error); }
+
+                        deleteDirectory(config.cstrike + @"\PODBot");
+                        e = GetLastError();
+                        if (e != null) { MessageBox.Show(e, "Exeção!", MessageBoxButtons.OK, MessageBoxIcon.Error); }
+
+                        MessageBox.Show("PodBot Desinstalado com sucesso!", "Operação Concluída!", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                        break;
+
+
+                    default:
+                        retn = 1;
+                        break;
+
+                }
+                return retn;
+            }
+
 
             public static bool checkForBots()
             {

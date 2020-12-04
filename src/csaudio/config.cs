@@ -43,5 +43,8 @@ namespace csaudio
         /* cstrike */
         public static string cstrike = "";
 
+        /* Last Error */
+        public static string lastError = "";
+
     }
 }

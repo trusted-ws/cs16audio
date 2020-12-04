@@ -111,6 +111,41 @@ namespace csaudio.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to // Command Menu definition
+        ///// 
+        ///// Basic Format:
+        /////		&quot;&lt;Bound Key&gt;&quot; &quot;&lt;Button Text&gt;&quot; &quot;&lt;Command sent to server&gt;&quot;
+        /////
+        ///// 
+        /////
+        /////
+        ///// Buttons can also open up submenus, as follows:
+        ///// {
+        ///// 	&quot;Some More Options&quot;,
+        /////	{
+        /////		...
+        /////	}
+        ///// }
+        /////
+        /////
+        ///// Buttons preceded with &quot;CUSTOM&quot; are handled in special ways. They can only be moved
+        ///// around or deleted.
+        /////
+        /////
+        ///// Limitations:
+        /////		Maximum of 40 menus.
+        /////		Maximum of 100 buttons per menu.
+        ///
+        /////--------------------------------------------------------
+        /////  [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string commandmenu {
+            get {
+                return ResourceManager.GetString("commandmenu", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap counter_strike_source_18px {
@@ -131,6 +166,16 @@ namespace csaudio.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] CreateMultiplayerGameServerPage {
+            get {
+                object obj = ResourceManager.GetObject("CreateMultiplayerGameServerPage", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap cs16 {
@@ -147,6 +192,16 @@ namespace csaudio.Properties {
             get {
                 object obj = ResourceManager.GetObject("cs161", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] cstrike_csbot {
+            get {
+                object obj = ResourceManager.GetObject("cstrike_csbot", resourceCulture);
+                return ((byte[])(obj));
             }
         }
         
@@ -207,6 +262,16 @@ namespace csaudio.Properties {
             get {
                 object obj = ResourceManager.GetObject("errorw_18px", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] liblist {
+            get {
+                object obj = ResourceManager.GetObject("liblist", resourceCulture);
+                return ((byte[])(obj));
             }
         }
         
