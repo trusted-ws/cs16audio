@@ -9,48 +9,18 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO.Compression;
+using System.Threading;
 
 
 namespace csaudio
 {
-    public static class ZipArchiveExtensions
-    {
-        public static void ExtractToDirectory(this ZipArchive archive, string destinationDirectoryName, bool overwrite)
-        {
-            if (!overwrite)
-            {
-                archive.ExtractToDirectory(destinationDirectoryName);
-                return;
-            }
-
-            DirectoryInfo di = Directory.CreateDirectory(destinationDirectoryName);
-            string destinationDirectoryFullPath = di.FullName;
-
-            foreach (ZipArchiveEntry file in archive.Entries)
-            {
-                string completeFileName = Path.GetFullPath(Path.Combine(destinationDirectoryFullPath, file.FullName));
-
-                if (!completeFileName.StartsWith(destinationDirectoryFullPath, StringComparison.OrdinalIgnoreCase))
-                {
-                    throw new IOException("Trying to extract file outside of destination directory. See this link for more info: https://snyk.io/research/zip-slip-vulnerability");
-                }
-
-                if (file.Name == "")
-                {// Assuming Empty for Directory
-                    Directory.CreateDirectory(Path.GetDirectoryName(completeFileName));
-                    continue;
-                }
-                file.ExtractToFile(completeFileName, true);
-            }
-        }
-    }
-
     public partial class bots : Form
     {
         public bots()
         {
             InitializeComponent();
         }
+
 
         private void checkbot()
         {
@@ -61,6 +31,7 @@ namespace csaudio
              *          2 - zbot
              *          3 - podbot
              */
+
             int type = auxiliary.Functions.botsType();
 
             if (!auxiliary.Functions.checkForBots())
@@ -99,57 +70,18 @@ namespace csaudio
         }
         private void bots_Load(object sender, EventArgs e)
         {
-            //debug
-            //auxiliary.Functions.removeBots();
             checkbot();
-            ////////
-            
-
         }
 
-/*        public void UnzipFile(string zipPath, string folderPath)
+        void extractCsfile()
         {
-
             try
             {
-                if (!File.Exists(zipPath))
-                {
-                    throw new FileNotFoundException();
-                }
-                if (!Directory.Exists(folderPath))
-                {
-                    Directory.CreateDirectory(folderPath);
-                }
-                Shell32.Shell objShell = new Shell32.Shell();
-                Shell32.Folder destinationFolder = objShell.NameSpace(folderPath);
-                Shell32.Folder sourceFile = objShell.NameSpace(zipPath);
-                foreach (var file in sourceFile.Items())
-                {
-                    destinationFolder.CopyHere(file, 4 | 16);
-                }
-            }
-            catch (Exception e)
-            {
-                //handle error
-            }
-        }*/
+                string path = config.cstrike;
 
-        private void btnInstalar_Click(object sender, EventArgs e)
-        {
-            // Next implementation...
-            // filename: cstrike_csbot.zip 
-            
-            //string path = config.cstrike + @"\cstrike_csbot";
-            string path = config.cstrike;
+                if (!File.Exists(config.cstrike + @"\cstrike_csbot.zip"))
+                    auxiliary.Functions.CopyResource(csaudio.Properties.Resources.cstrike_csbot, config.cstrike + @"\cstrike_csbot.zip");
 
-            if (!File.Exists(config.cstrike + @"\cstrike_csbot.zip"))
-                auxiliary.Functions.CopyResource(csaudio.Properties.Resources.cstrike_csbot, config.cstrike + @"\cstrike_csbot.zip");
-
-            try
-            {
-                MessageBox.Show("Continue!", "debuuuuug");
-
-                // open filestream
                 using (FileStream csfileS = new FileStream(config.cstrike + @"\cstrike_csbot.zip", FileMode.Open))
                 {
                     using (ZipArchive csfile = new ZipArchive(csfileS, ZipArchiveMode.Update))
@@ -157,7 +89,36 @@ namespace csaudio
                         ZipArchiveExtensions.ExtractToDirectory(csfile, path, true);
                     }
                 }
-                // ZipArchiveExtensions.ExtractToDirectory(config.cstrike + @"\cstrike_csbot.zip", path, true);
+            } catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Ooops!");
+            }
+
+        }
+
+        private void btnInstalar_Click(object sender, EventArgs e)
+        {
+            string path = config.cstrike;
+
+            if (!File.Exists(config.cstrike + @"\cstrike_csbot.zip"))
+                auxiliary.Functions.CopyResource(csaudio.Properties.Resources.cstrike_csbot, config.cstrike + @"\cstrike_csbot.zip");
+
+            try
+            {
+                button2.Enabled = false;
+                btnInstalar.Enabled = false;
+                btnRemover.Enabled = false;
+
+                Thread extract = new Thread(extractCsfile);
+                extract.Start();
+
+                lblStatus.Text = "Aguarde...";
+                lblStatus.ForeColor = Color.Black;
+                timerMessage.Enabled = true;
+                timerMessage.Start();
+                lblStatus.Update();
+
+                extract.Join();
 
             }
             catch (Exception exc)
@@ -165,7 +126,16 @@ namespace csaudio
                 MessageBox.Show(exc.Message, "Erro aqui carai");
             }
 
+            /* Check if file .zip exists and delete it */
+            if (File.Exists(config.cstrike + @"\cstrike_csbot.zip"))
+                File.Delete(config.cstrike + @"\cstrike_csbot.zip");
+
+            timerMessage.Stop();
             checkbot();
+
+            /* Enable Buttons */
+            button2.Enabled = true;
+
             MessageBox.Show("Instalação do CSBOT concluída!", "Instalação Concluída!", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
         }
@@ -187,6 +157,68 @@ namespace csaudio
         private void button2_Click(object sender, EventArgs e)
         {
             this.Close();
+        }
+
+
+        int timerMessageCounter = 0;
+        private void timerMessage_Tick(object sender, EventArgs e)
+        {
+            lblStatus.Update();
+            switch(timerMessageCounter)
+            {
+                case 0:
+                    lblStatus.Text = "Aguarde";
+                    lblStatus.Update();
+                    timerMessageCounter++;
+                    break;
+                case 1:
+                    lblStatus.Text = "Aguarde.";
+                    lblStatus.Update();
+                    timerMessageCounter++;
+                    break;
+                case 2:
+                    lblStatus.Text = "Aguarde..";
+                    lblStatus.Update();
+                    timerMessageCounter++;
+                    break;
+                case 3:
+                    lblStatus.Text = "Aguarde...";
+                    lblStatus.Update();
+                    timerMessageCounter = 0;
+                    break;
+            }
+        }
+    }
+
+    public static class ZipArchiveExtensions
+    {
+        public static void ExtractToDirectory(this ZipArchive archive, string destinationDirectoryName, bool overwrite)
+        {
+            if (!overwrite)
+            {
+                archive.ExtractToDirectory(destinationDirectoryName);
+                return;
+            }
+
+            DirectoryInfo di = Directory.CreateDirectory(destinationDirectoryName);
+            string destinationDirectoryFullPath = di.FullName;
+
+            foreach (ZipArchiveEntry file in archive.Entries)
+            {
+                string completeFileName = Path.GetFullPath(Path.Combine(destinationDirectoryFullPath, file.FullName));
+
+                if (!completeFileName.StartsWith(destinationDirectoryFullPath, StringComparison.OrdinalIgnoreCase))
+                {
+                    throw new IOException("Trying to extract file outside of destination directory. See this link for more info: https://snyk.io/research/zip-slip-vulnerability");
+                }
+
+                if (file.Name == "")
+                {   // Assuming Empty for Directory
+                    Directory.CreateDirectory(Path.GetDirectoryName(completeFileName));
+                    continue;
+                }
+                file.ExtractToFile(completeFileName, true);
+            }
         }
     }
 }

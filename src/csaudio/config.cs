@@ -8,9 +8,9 @@ namespace csaudio
 {
     public static class config
     {
-        ////////////////////////
+        ///////////////////////////////
         // Controles (NÃO MODIFICAR)
-        ////////////////////////
+        ///////////////////////////////
         
         /* Trigger para resetar os audios */
         public static bool reset = false;
@@ -24,9 +24,9 @@ namespace csaudio
         /* Caso haja bots na estrutura de diretórios do cstrike isto será definido como true */
         public static bool haveBots = false;
 
-        ////////////////////////
+        ///////////////////////////////
         // Definições
-        ////////////////////////
+        ///////////////////////////////
 
         /* Diretório padrão Steam */
         public static string steamDir = @"Program Files (x86)\Steam\steamapps\common\Half-Life\cstrike";

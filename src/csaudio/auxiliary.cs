@@ -359,7 +359,7 @@ namespace csaudio
 
                 /* Check for bots: csbot, zbot, podbot structures */
 
-                if (File.Exists(config.cstrike + @"\dlls\csbot.dll") && Directory.Exists(config.cstrike + @"\sound\radio\bot"))
+                if (File.Exists(config.cstrike + @"\dlls\csbot.dll"))
                 {
                     /* csbot (to install) */
                     bots = true;

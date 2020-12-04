@@ -469,8 +469,7 @@ namespace csaudio
 
                     /* Process Audio Files */
                     
-                    //////////////////////
-                    /// TODO:
+                    /// TODO: [DONE!]
                     ///    - Copy and replace the audios files on their respectives directory.
                     ///    - Store the original audio files on the Resources Section.
                     ///    - Implement the 'reset audio to the originals' (Move the files on the Resource Sections to cstrike audio location
@@ -674,6 +673,13 @@ namespace csaudio
         {
             bots b = new bots();
             b.ShowDialog();
+        }
+
+        private void lblCredits_Click(object sender, EventArgs e)
+        {
+            DialogResult r = MessageBox.Show("Deseja abrir a página do código fonte do projeto?", "Continuar para GitHub?", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1);
+            if(r == DialogResult.Yes)
+                System.Diagnostics.Process.Start("https://github.com/trusted-ws/cs16audio");
         }
     }
 }

@@ -29,13 +29,15 @@ namespace csaudio
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(bots));
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.lblStatus = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.btnRemover = new System.Windows.Forms.Button();
             this.btnInstalar = new System.Windows.Forms.Button();
-            this.lblStatus = new System.Windows.Forms.Label();
             this.button2 = new System.Windows.Forms.Button();
+            this.timerMessage = new System.Windows.Forms.Timer(this.components);
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -48,6 +50,15 @@ namespace csaudio
             this.groupBox1.Size = new System.Drawing.Size(431, 95);
             this.groupBox1.TabIndex = 14;
             this.groupBox1.TabStop = false;
+            // 
+            // lblStatus
+            // 
+            this.lblStatus.Location = new System.Drawing.Point(11, 21);
+            this.lblStatus.Name = "lblStatus";
+            this.lblStatus.Size = new System.Drawing.Size(408, 63);
+            this.lblStatus.TabIndex = 1;
+            this.lblStatus.Text = "Nenhum BOT encontrado no seu Counter Strike 1.6";
+            this.lblStatus.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // label2
             // 
@@ -97,15 +108,6 @@ namespace csaudio
             this.btnInstalar.UseVisualStyleBackColor = true;
             this.btnInstalar.Click += new System.EventHandler(this.btnInstalar_Click);
             // 
-            // lblStatus
-            // 
-            this.lblStatus.Location = new System.Drawing.Point(11, 21);
-            this.lblStatus.Name = "lblStatus";
-            this.lblStatus.Size = new System.Drawing.Size(408, 63);
-            this.lblStatus.TabIndex = 1;
-            this.lblStatus.Text = "Nenhum BOT encontrado no seu Counter Strike 1.6";
-            this.lblStatus.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
             // button2
             // 
             this.button2.FlatAppearance.BorderSize = 0;
@@ -124,6 +126,11 @@ namespace csaudio
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
+            // timerMessage
+            // 
+            this.timerMessage.Interval = 1000;
+            this.timerMessage.Tick += new System.EventHandler(this.timerMessage_Tick);
+            // 
             // bots
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -136,7 +143,7 @@ namespace csaudio
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.label2);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
-            //this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "bots";
@@ -157,5 +164,6 @@ namespace csaudio
         private System.Windows.Forms.Button btnRemover;
         private System.Windows.Forms.Label lblStatus;
         private System.Windows.Forms.Button button2;
+        public System.Windows.Forms.Timer timerMessage;
     }
 }
